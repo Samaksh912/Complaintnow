@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "261888003913",
+    "project_id": "complaintnow-77739",
+    "storage_bucket": "complaintnow-77739.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261888003913:android:d0513da97df477d49cd498",
+        "android_client_info": {
+          "package_name": "com.example.complaintnow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261888003913-0pb207f23q2ijl0on4f4bk5f1u6306he.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiIJVQ4PLZegXlg9RQyCJ8I6p_6H0RO_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "261888003913-0pb207f23q2ijl0on4f4bk5f1u6306he.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "261888003913-oseif2mmn4mkmrd4ng1a434ttm2q5l6i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.complaintnow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
