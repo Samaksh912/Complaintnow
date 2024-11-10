@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';  // Add Firestore import
 
 class Authservice {
   final _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();  // Explicit instance for better management
+  final FirebaseFirestore _db = FirebaseFirestore.instance;  // Firestore instance
 
   void debugprint(String message) {
     assert(() {
@@ -15,6 +17,32 @@ class Authservice {
 
   // Get current user UID
   String getcurrentuid() => _auth.currentUser!.uid;
+
+  // Method to save user info to Firestore (after Google or Email/Password login)
+  Future<void> saveUserInfoToFirestore(User user) async {
+    String uid = user.uid;
+    String name = user.displayName ?? 'No Name';  // Default value if displayName is null
+    String email = user.email ?? 'No Email';
+
+    // Check if the user already exists in Firestore
+    DocumentSnapshot userDoc = await _db.collection('Users').doc(uid).get();
+
+    if (!userDoc.exists) {
+      // If the user does not exist, create their profile
+      var userProfile = {
+        'uid': uid,
+        'name': name,
+        'email': email,
+        'isadmin': false,  // Set default as false; can be updated if needed
+      };
+
+      // Save user info to Firestore
+      await _db.collection("Users").doc(uid).set(userProfile);
+      debugprint('User added to Firestore');
+    } else {
+      debugprint('User already exists in Firestore');
+    }
+  }
 
   // Google Sign-In method with email validation
   Future<User?> googlesignin(BuildContext context) async {
@@ -45,6 +73,7 @@ class Authservice {
 
       if (user != null && user.email != null && user.email!.endsWith('@srmist.edu.in')) {
         // Proceed if email domain matches the college domain
+        await saveUserInfoToFirestore(user);  // Save user info after sign-in
         return user;
       } else {
         // Sign out if the email domain does not match
@@ -83,48 +112,52 @@ class Authservice {
         // Handle case if there is no current user logged in
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('No user is currently logged in.'))
-    );
-    return;
-    }
+        );
+        return;
+      }
 
-    // Reauthenticate the user
-    AuthCredential credential = EmailAuthProvider.credential(
-    email: user.email!,
-    password: currentPassword,
-    );
+      // Reauthenticate the user
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
 
-    // Reauthenticate with the provided credentials
-    await user.reauthenticateWithCredential(credential);
+      // Reauthenticate with the provided credentials
+      await user.reauthenticateWithCredential(credential);
 
-    // Check for password strength (add your own validation if necessary)
-    if (newPassword.length < 6) {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Password should be at least 6 characters long.')));
-    return;
-    }
+      // Check for password strength (add your own validation if necessary)
+      if (newPassword.length < 6) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Password should be at least 6 characters long.')));
 
-    // Update the password
-    await user.updatePassword(newPassword);
+        return;
+      }
 
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Password changed successfully.')));
+      // Update the password
+      await user.updatePassword(newPassword);
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Password changed successfully.')));
+
     } on FirebaseAuthException catch (e) {
-    // Handle specific Firebase errors
-    if (e.code == 'wrong-password') {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Incorrect current password.')));
-    } else if (e.code == 'weak-password') {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('New password is too weak.')));
-    } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('An error occurred: ${e.message}')));
-    }
+      // Handle specific Firebase errors
+      if (e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Incorrect current password.')));
+
+      } else if (e.code == 'weak-password') {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('New password is too weak.')));
+
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('An error occurred: ${e.message}')));
+      }
     } catch (e) {
-    debugprint("Error: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('An unexpected error occurred.')));
+      debugprint("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An unexpected error occurred.')));
     }
   }
 }

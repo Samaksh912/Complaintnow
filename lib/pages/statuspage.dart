@@ -32,6 +32,7 @@ class _StatusPageState extends State<StatusPage> {
       appBar: AppBar(
         title: Text("My Complaints",style: TextStyle(color: Colors.white),),
         backgroundColor: Colors.green,
+        centerTitle: true,
       ),
       body:
 
@@ -51,6 +52,7 @@ class _StatusPageState extends State<StatusPage> {
                 itemBuilder: (context, index) {
                   final post = allUserPosts[index];
                   return Homepagetile(
+                    timestamp: post.timestamp,
                     uid: post.uid,
                     postid: post.id,
                     registernumber: post.registernumber,

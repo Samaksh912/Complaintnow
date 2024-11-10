@@ -165,6 +165,7 @@ class _HomepageState extends State<Homepage> {
         final post = posts[index];
         // Pass the toggleComplaintStatus function to Homepagetile
         return Homepagetile(
+          timestamp: post.timestamp,
           uid: post.uid,
           postid: post.id,
           hostelname: post.hostelname,
@@ -216,6 +217,7 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ),
                   TextField(
+                    controller: _complainttypecontroller,
                     decoration: const InputDecoration(hintText: "Enter Complaint Type"),
                   ),
                   TextField(

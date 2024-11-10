@@ -45,6 +45,12 @@ dependencies:
   lottie:
   parallax_rain:
   url_launcher: ^6.3.1
+  flutter_launcher_icons: ^0.14.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/complaintlogo.png"
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +87,7 @@ flutter:
      - lib/assets/facebook.webp
      - lib/assets/instagram.png
      - lib/assets/srm.webp
+     - lib/assets/complaintlogo.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

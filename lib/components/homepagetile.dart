@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaintnow/services/databaseprovider.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +14,7 @@ class Homepagetile extends StatefulWidget {
   final String complaint;
   final String uid;
   final String status;
+  final Timestamp timestamp; // Add the timestamp
   final VoidCallback? onToggleStatus;
 
   Homepagetile({
@@ -24,6 +25,7 @@ class Homepagetile extends StatefulWidget {
     required this.complaint,
     required this.uid,
     required this.status,
+    required this.timestamp, // Initialize timestamp
     this.onToggleStatus,
   });
 
@@ -41,15 +43,29 @@ class _HomepagetileState extends State<Homepagetile> {
   void initState() {
     super.initState();
     databaseProvider = Provider.of<DatabaseProvider>(context, listen: false);
+    _fetchAdminStatus(); // Fetch the admin status when widget is initialized
     _fetchStarCount(); // Fetch the star count when the widget is initialized
   }
 
-  void debugprint(String message){
-    assert((){
+  void debugprint(String message) {
+    assert(() {
       print(message);
       return true;
     }());
   }
+
+  // Fetch the admin status for the current user
+  void _fetchAdminStatus() async {
+    try {
+      bool adminStatus = await databaseProvider.isCurrentUserAdmin();
+      setState(() {
+        isAdmin = adminStatus; // Update the isAdmin value
+      });
+    } catch (e) {
+      debugprint("Error fetching admin status: $e");
+    }
+  }
+
   // Method to fetch the star count for the post
   void _fetchStarCount() async {
     try {
@@ -103,6 +119,10 @@ class _HomepagetileState extends State<Homepagetile> {
     final listeningProvider = Provider.of<DatabaseProvider>(context);
     bool likedbycurrentuser = listeningProvider.ispostlikedbycurrentuser(widget.postid);
 
+    // Parse timestamp to DateTime object and format
+    DateTime timestamp = widget.timestamp.toDate();
+    String formattedTimestamp = "${timestamp.day}/${timestamp.month}/${timestamp.year} ${timestamp.hour}:${timestamp.minute}";
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       child: Container(
@@ -119,7 +139,7 @@ class _HomepagetileState extends State<Homepagetile> {
               children: [
                 Expanded(
                   child: Text(
-                    'Hostel Name: ${widget.hostelname}\nComplaint Type: ${widget.complainttype}\nRegister Number: ${widget.registernumber}',
+                    'Hostel Name: ${widget.hostelname}\nComplaint Type: ${widget.complainttype}\nRegister Number: RA${widget.registernumber}',
                     style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
@@ -162,6 +182,11 @@ class _HomepagetileState extends State<Homepagetile> {
                     ? TextDecoration.lineThrough
                     : TextDecoration.none,
               ),
+            ),
+            // Display the timestamp
+            Text(
+              "Posted on: $formattedTimestamp",
+              style: TextStyle(fontSize: 12, color: Colors.white70),
             ),
             // Status and Edit button
             Row(

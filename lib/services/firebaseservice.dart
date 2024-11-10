@@ -31,7 +31,7 @@ class database {
     String uid = _auth.currentUser!.uid;
 
     // Check if the email is from the college domain
-    if (!email.endsWith('@college.edu')) {
+    if (!email.endsWith('@srmist.edu.in')) {
       debugprint("The email must be a valid college email.");
       return;
     }
@@ -45,6 +45,8 @@ class database {
     final userMap = user.toMap();
     await _db.collection("Users").doc(uid).set(userMap);
   }
+
+
 
   // getting the user info method
   Future<UserProfile?> getuserfromfirebase(String uid) async {
