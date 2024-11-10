@@ -4,6 +4,14 @@ import 'package:flutter/material.dart';
 
 class Authservice {
   final _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();  // Explicit instance for better management
+
+  void debugprint(String message) {
+    assert(() {
+      print(message);
+      return true;
+    }());
+  }
 
   // Get current user UID
   String getcurrentuid() => _auth.currentUser!.uid;
@@ -11,8 +19,11 @@ class Authservice {
   // Google Sign-In method with email validation
   Future<User?> googlesignin(BuildContext context) async {
     try {
+      // First, ensure any previous Google session is cleared
+      await _googleSignIn.signOut();  // Clears cached sign-in session
+
       // Begin the interactive sign-in process
-      final GoogleSignInAccount? guser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? guser = await _googleSignIn.signIn();
 
       if (guser == null) {
         // User canceled the sign-in
@@ -44,15 +55,21 @@ class Authservice {
         return null; // Return null if email domain is invalid
       }
     } catch (e) {
-      print("Google Sign-In Error: $e");
+      debugprint("Google Sign-In Error: $e");
       return null;
     }
   }
 
   // Sign out method
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
-    await _auth.signOut();
+    try {
+      // Ensure to clear both Firebase and Google Sign-In sessions
+      await _googleSignIn.signOut();  // Explicitly sign out from GoogleSignIn
+      await _auth.signOut();          // Sign out from Firebase
+      debugprint("User signed out.");
+    } catch (e) {
+      debugprint("Error during sign out: $e");
+    }
   }
 
   // Change password method
@@ -65,55 +82,49 @@ class Authservice {
       if (user == null) {
         // Handle case if there is no current user logged in
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No user is currently logged in.')),
-        );
-        return;
-      }
+            SnackBar(content: Text('No user is currently logged in.'))
+    );
+    return;
+    }
 
-      // Reauthenticate the user
-      AuthCredential credential = EmailAuthProvider.credential(
-        email: user.email!,
-        password: currentPassword,
-      );
+    // Reauthenticate the user
+    AuthCredential credential = EmailAuthProvider.credential(
+    email: user.email!,
+    password: currentPassword,
+    );
 
-      // Reauthenticate with the provided credentials
-      await user.reauthenticateWithCredential(credential);
+    // Reauthenticate with the provided credentials
+    await user.reauthenticateWithCredential(credential);
 
-      // Check for password strength (add your own validation if necessary)
-      if (newPassword.length < 6) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Password should be at least 6 characters long.')),
-        );
-        return;
-      }
+    // Check for password strength (add your own validation if necessary)
+    if (newPassword.length < 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Password should be at least 6 characters long.')));
+    return;
+    }
 
-      // Update the password
-      await user.updatePassword(newPassword);
+    // Update the password
+    await user.updatePassword(newPassword);
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password changed successfully.')),
-      );
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Password changed successfully.')));
     } on FirebaseAuthException catch (e) {
-      // Handle specific Firebase errors
-      if (e.code == 'wrong-password') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Incorrect current password.')),
-        );
-      } else if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('New password is too weak.')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An error occurred: ${e.message}')),
-        );
-      }
+    // Handle specific Firebase errors
+    if (e.code == 'wrong-password') {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Incorrect current password.')));
+    } else if (e.code == 'weak-password') {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('New password is too weak.')));
+    } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('An error occurred: ${e.message}')));
+    }
     } catch (e) {
-      print("Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An unexpected error occurred.')),
-      );
+    debugprint("Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('An unexpected error occurred.')));
     }
   }
 }

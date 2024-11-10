@@ -1,6 +1,6 @@
 import 'package:complaintnow/pages/authpage.dart';
 import 'package:complaintnow/services/databaseprovider.dart'; // Import your DatabaseProvider
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +13,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  debugDefaultTargetPlatformOverride = TargetPlatform.android;
 
   runApp(
     MultiProvider(

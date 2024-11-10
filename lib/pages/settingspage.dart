@@ -6,7 +6,12 @@ class Settingspage extends StatelessWidget {
   final currentuser = FirebaseAuth.instance.currentUser!;
 
   Settingspage({super.key});
-
+void debugprint(String message){
+  assert((){
+    print(message);
+    return true;
+  }());
+}
   // Function to launch URLs for social media or support
   Future<void> _launchURL(String url) async {
     if (await canLaunchUrl(Uri.parse(url))) {
@@ -15,7 +20,7 @@ class Settingspage extends StatelessWidget {
         mode: LaunchMode.externalApplication,
       );
     } else {
-      print("Error: Could not launch $url");
+      debugprint("Error: Could not launch $url");
     }
   }
 
@@ -113,7 +118,7 @@ class Settingspage extends StatelessWidget {
                         width: 50,
                       ),
                       onPressed: () {
-                        _launchURL('https://www.google.com');
+                        _launchURL('https://www.srmist.edu.in');
                       },
                     ),
                     // Instagram Icon
@@ -257,7 +262,7 @@ class Settingspage extends StatelessWidget {
                   confirmPasswordController.clear();
                   Navigator.pop(context);
                 } catch (e) {
-                  print("Error: $e");
+                  debugprint("Error: $e");
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Failed to change password. Please try again.'),
                   ));

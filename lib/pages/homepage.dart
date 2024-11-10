@@ -2,7 +2,6 @@ import 'package:complaintnow/components/drawerside.dart';
 import 'package:complaintnow/components/homepagetile.dart';
 import 'package:complaintnow/components/postmodel.dart';
 import 'package:complaintnow/services/databaseprovider.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +22,7 @@ class _HomepageState extends State<Homepage> {
   void toggleComplaintStatus(String postId, String currentStatus) async {
     String newStatus = currentStatus == "Pending" ? "Completed" : "Pending";
     await databaseProvider.updateComplaintStatus(postId, newStatus);
-    await loadallposts(); // Reload posts after status change
+    await loadAllPosts(); // Reload posts after status change
   }
 
   @override
@@ -36,7 +35,7 @@ class _HomepageState extends State<Homepage> {
     });
     databaseProvider = Provider.of<DatabaseProvider>(context, listen: false);
     loadAdminStatus(); // Check if user is admin
-    loadallposts();
+    loadAllPosts();
   }
 
   @override
@@ -45,18 +44,73 @@ class _HomepageState extends State<Homepage> {
     super.dispose();
   }
 
+  void debugPrint(String message) {
+    assert(() {
+      print(message);
+      return true;
+    }());
+  }
+
   Future<void> loadAdminStatus() async {
     isAdmin = await databaseProvider.isCurrentUserAdmin();
     setState(() {}); // Update UI to reflect admin status
   }
 
-  Future<void> loadallposts() async {
+  Future<void> loadAllPosts() async {
     try {
       await databaseProvider.loadallposts();
-      print("Posts loaded: ${databaseProvider.allposts.length}");
+      debugPrint("Posts loaded: ${databaseProvider.allposts.length}");
     } catch (e) {
-      print("Error loading posts: $e");
+      debugPrint("Error loading posts: $e");
     }
+  }
+  // this method is for the sorting options
+  void _showSortOptionsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color(0xFFFFFFFF),
+          title: const Text(
+            "Sort Posts",
+            style: TextStyle(color: Color(0xFF212121)),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Most Recent"),
+                onTap: () {
+                  context.read<DatabaseProvider>().sortPosts('Most Recent');
+                  Navigator.pop(context); // Close dialog
+                },
+              ),
+              ListTile(
+                title: Text("Most Rated"),
+                onTap: () {
+                  context.read<DatabaseProvider>().sortPosts('Most Rated');
+                  Navigator.pop(context); // Close dialog
+                },
+              ),
+              ListTile(
+                title: Text("Pending Only"),
+                onTap: () {
+                  context.read<DatabaseProvider>().sortPosts('Pending Only');
+                  Navigator.pop(context); // Close dialog
+                },
+              ),
+              ListTile(
+                title: Text("Completed Only"),
+                onTap: () {
+                  context.read<DatabaseProvider>().sortPosts('Completed Only');
+                  Navigator.pop(context); // Close dialog
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -72,9 +126,25 @@ class _HomepageState extends State<Homepage> {
         ),
         backgroundColor: Color(0xFF388E3C),
         centerTitle: true,
+        actions: [
+          // Sort icon in the AppBar
+          IconButton(
+            icon: Icon(Icons.sort),
+            onPressed: _showSortOptionsDialog,
+          ),
+        ],
+
+
       ),
       backgroundColor: Color(0xFFF4F6F8),
-      body: _buildPostList(databaseProvider.allposts),
+      body: Consumer<DatabaseProvider>(
+        builder: (context, databaseProvider, child) {
+          // The list of posts is now sorted as per the selected option
+          final posts = databaseProvider.allposts;
+
+          return _buildPostList(posts); // Render the sorted posts
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddComplaintDialog,
         backgroundColor: Color(0xFF388E3C),
@@ -139,7 +209,6 @@ class _HomepageState extends State<Homepage> {
                     },
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-
                     decoration: InputDecoration(
                       prefixText: _isFocused ? 'RA' : null,
                       hintText: _isFocused ? null : 'Enter Register Number',
@@ -147,7 +216,6 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ),
                   TextField(
-
                     decoration: const InputDecoration(hintText: "Enter Complaint Type"),
                   ),
                   TextField(
@@ -217,7 +285,7 @@ class _HomepageState extends State<Homepage> {
                                 _hostelnamecontroller.clear();
                                 _complainttypecontroller.clear();
 
-                                await loadallposts();
+                                await loadAllPosts();
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text("Failed to add complaint: $e")),
@@ -245,4 +313,5 @@ class _HomepageState extends State<Homepage> {
         );
       },
     );
-  }}
+  }
+}

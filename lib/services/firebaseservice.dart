@@ -15,6 +15,12 @@ class database {
   }
 
 
+  void debugprint(String message){
+    assert((){
+      print(message);
+      return true;
+    }());
+  }
 
 
   // saving the user info
@@ -26,7 +32,7 @@ class database {
 
     // Check if the email is from the college domain
     if (!email.endsWith('@college.edu')) {
-      print("The email must be a valid college email.");
+      debugprint("The email must be a valid college email.");
       return;
     }
 
@@ -52,7 +58,7 @@ class database {
         return null;
       }
     } catch (e) {
-      print('Error: $e');
+      debugprint('Error: $e');
       return null;
     }
   }
@@ -107,7 +113,7 @@ class database {
         return Post.fromDocument(doc);
       }).toList();
     } catch (e) {
-      print("Error fetching posts: $e");
+      debugprint("Error fetching posts: $e");
       return [];
     }
   }
@@ -164,9 +170,9 @@ class database {
       await _db.collection("Posts").doc(postId).update({
         'status': newStatus, // Update the status field in Firestore
       });
-      print("Status updated to: $newStatus for post ID: $postId");
+      debugprint("Status updated to: $newStatus for post ID: $postId");
     } catch (e) {
-      print("Error updating status: $e");
+      debugprint("Error updating status: $e");
     }
   }
 }

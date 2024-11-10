@@ -21,8 +21,14 @@ class _loginpageState extends State<loginpage> {
 
   final passwordcontroller = TextEditingController();
 
-  //loading circle
-  
+
+
+  void debugprint(String message){
+    assert((){
+      print(message);
+      return true;
+    }());
+  }
 // sign user in method
   void signuserin() async {
     // Show loading dialog
@@ -42,7 +48,7 @@ class _loginpageState extends State<loginpage> {
       // Close the loading spinner after successful sign-in
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
-      print(e.code);
+      debugprint(e.code);
       // Close the loading spinner before showing an error
       Navigator.pop(context);
 
@@ -174,17 +180,41 @@ class _loginpageState extends State<loginpage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      //google button
-                      Squaretile(imagepath: 'lib/assets/img_6.png',
-                        onTap: () => Authservice().googlesignin(context) ,
+                      Builder(
+                        builder: (context) {
+                          final user = FirebaseAuth.instance.currentUser;
+                          if (user == null) {
+                            // User is not signed in, show Google sign-in button
+                            return Squaretile(
+                              imagepath: 'lib/assets/img_6.png',
+                              onTap: () async {
+                                User? user = await Authservice().googlesignin(context);
+                                if (user != null) {
+                                  // Do something after successful sign-in
+                                  // For example, navigate to another page
+                                }
+                              },
+                            );
+                          } else {
+                            // User is signed in, you can show a sign-out button
+                            return ElevatedButton(
+                              onPressed: () async {
+                                await Authservice().signOut();
+                                // Handle any other actions after sign-out (e.g., refresh UI)
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text("Signed out successfully"),
+                                ));
+                              },
+                              child: Text('Sign Out'),
+                            );
+                          }
+                        },
                       ),
-                    
-
-                    
-                    
                     ],
                   ),
-                    
+
+
+
                   const SizedBox(height: 15,),
                     
                   Row(

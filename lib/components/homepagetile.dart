@@ -44,13 +44,19 @@ class _HomepagetileState extends State<Homepagetile> {
     _fetchStarCount(); // Fetch the star count when the widget is initialized
   }
 
+  void debugprint(String message){
+    assert((){
+      print(message);
+      return true;
+    }());
+  }
   // Method to fetch the star count for the post
   void _fetchStarCount() async {
     try {
       starCount = await databaseProvider.getStarCount(widget.postid); // Retrieve star count from the database
       setState(() {}); // Refresh the UI with the new count
     } catch (e) {
-      print("Error fetching star count: $e");
+      debugprint("Error fetching star count: $e");
     }
   }
 
@@ -66,7 +72,7 @@ class _HomepagetileState extends State<Homepagetile> {
 
   postdelete(BuildContext context) async {
     if (widget.postid.isEmpty) {
-      print("Post ID is empty, cannot delete.");
+      debugprint("Post ID is empty, cannot delete.");
       return;
     }
 
@@ -78,14 +84,14 @@ class _HomepagetileState extends State<Homepagetile> {
     }
 
     try {
-      print("Delete button pressed for post ID: ${widget.postid}");
+      debugprint("Delete button pressed for post ID: ${widget.postid}");
       await databaseProvider.deletepost(widget.postid);
-      print("Post deletion attempted for post ID: ${widget.postid}");
+      debugprint("Post deletion attempted for post ID: ${widget.postid}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Complaint deleted')),
       );
     } catch (e) {
-      print("Error deleting post: $e");
+      debugprint("Error deleting post: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error deleting complaint')),
       );
