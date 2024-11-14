@@ -41,7 +41,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBBnMbt3WxGJM-bTyhPu8e3qjuKu_ZfRnw',
+    apiKey: 'your api key here', //todo add api key
     appId: '1:261888003913:web:4842673e2620183d9cd498',
     messagingSenderId: '261888003913',
     projectId: 'complaintnow-77739',
@@ -50,7 +50,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBiIJVQ4PLZegXlg9RQyCJ8I6p_6H0RO_E',
+    apiKey: 'your api key here',//todo add api key
     appId: '1:261888003913:android:d0513da97df477d49cd498',
     messagingSenderId: '261888003913',
     projectId: 'complaintnow-77739',
@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBiBJMJdC4FxmCmTEjgdetNhZcDJUuGlrA',
+    apiKey: 'your api key here',//todo add api key
     appId: '1:261888003913:ios:98b6475d43cc6a469cd498',
     messagingSenderId: '261888003913',
     projectId: 'complaintnow-77739',
@@ -68,7 +68,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBiBJMJdC4FxmCmTEjgdetNhZcDJUuGlrA',
+    apiKey: 'your api key here',//todo add api key
     appId: '1:261888003913:ios:98b6475d43cc6a469cd498',
     messagingSenderId: '261888003913',
     projectId: 'complaintnow-77739',
@@ -78,7 +78,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBBnMbt3WxGJM-bTyhPu8e3qjuKu_ZfRnw',
+    apiKey: 'your api key here',//todo add api key
     appId: '1:261888003913:web:b9c57570e019ef099cd498',
     messagingSenderId: '261888003913',
     projectId: 'complaintnow-77739',
